@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>GymTrack</title>
+    <link rel="apple-touch-icon" href="icon.svg">
+    <link rel="icon" type="image/svg+xml" href="icon.svg">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="GymTrack">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="css/app.css" rel="stylesheet">
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════
+     REST TIMER — sticky top overlay
+══════════════════════════════════════════ -->
+<div id="restTimerBar" class="rest-timer-bar d-none">
+    <div class="rest-timer-inner">
+        <div class="rest-timer-label">Rest Timer</div>
+        <div class="rest-timer-countdown" id="spanRestCountdown">1:30</div>
+        <div class="d-flex gap-2">
+            <button class="btn btn-sm btn-outline-light" id="btnRestAdd15">+15s</button>
+            <button class="btn btn-sm btn-light" id="btnSkipRest">Skip</button>
+        </div>
+    </div>
+    <div class="rest-timer-progress">
+        <div class="rest-timer-progress-fill" id="restProgressFill"></div>
+    </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     PAGE: Workouts (Template List)
+══════════════════════════════════════════ -->
+<div id="pageWorkouts" class="page-view">
+    <div class="page-header">
+        <h1 class="page-title">Workouts</h1>
+        <button class="btn btn-accent btn-sm" id="btnNewRoutine">
+            <i class="bi bi-plus-lg"></i> New
+        </button>
+    </div>
+
+    <div class="px-3 pb-3">
+        <!-- Quick Start -->
+        <div class="section-label">QUICK START</div>
+        <button class="btn-card w-100 mb-3 text-start" id="btnEmptyWorkout">
+            <i class="bi bi-lightning-charge-fill text-accent me-2"></i>
+            Start Empty Workout
+        </button>
+
+        <!-- Template List -->
+        <div class="section-label">MY ROUTINES</div>
+        <div id="divRoutineList"></div>
+        <div id="divNoRoutines" class="empty-state d-none">
+            <i class="bi bi-clipboard2 display-5 text-muted"></i>
+            <p class="text-muted mt-2 mb-0">No routines yet.</p>
+            <p class="text-muted small">Tap <strong>New</strong> to create one.</p>
+        </div>
+    </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     PAGE: Template Editor
+══════════════════════════════════════════ -->
+<div id="pageTemplateEditor" class="page-view d-none">
+    <div class="page-header">
+        <button class="btn-icon" id="btnBackFromEditor"><i class="bi bi-chevron-left"></i></button>
+        <h1 class="page-title" id="headingTemplateEditor">New Routine</h1>
+        <button class="btn btn-accent btn-sm" id="btnSaveRoutine">Save</button>
+    </div>
+    <div class="px-3 pb-3">
+        <div class="form-group-dark mb-3">
+            <label class="form-label-dark" for="txtRoutineName">Routine Name</label>
+            <input class="input-dark" id="txtRoutineName" type="text" placeholder="e.g. Push Day">
+        </div>
+        <div class="form-group-dark mb-4">
+            <label class="form-label-dark" for="txtRoutineNotes">Notes (optional)</label>
+            <input class="input-dark" id="txtRoutineNotes" type="text" placeholder="e.g. Mon / Wed / Fri">
+        </div>
+
+        <div class="section-label">EXERCISES</div>
+        <div id="divTemplateExercises"></div>
+        <div id="divNoTemplateExercises" class="text-muted small text-center py-2">No exercises added.</div>
+
+        <button class="btn-card w-100 mt-2" id="btnAddExerciseToTemplate">
+            <i class="bi bi-plus-lg text-accent me-2"></i> Add Exercise
+        </button>
+
+        <button class="btn btn-outline-danger w-100 mt-4 d-none" id="btnDeleteRoutine">
+            <i class="bi bi-trash"></i> Delete Routine
+        </button>
+    </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     PAGE: Active Workout
+══════════════════════════════════════════ -->
+<div id="pageActiveWorkout" class="page-view d-none">
+    <div class="page-header">
+        <button class="btn-icon" id="btnCancelWorkout"><i class="bi bi-xmark"></i></button>
+        <div class="text-center flex-grow-1">
+            <div class="page-title" id="headingActiveWorkout">Workout</div>
+            <div class="workout-elapsed text-accent" id="spanWorkoutTimer">0:00</div>
+        </div>
+        <button class="btn btn-accent btn-sm" id="btnFinishWorkout">Finish</button>
+    </div>
+
+    <div class="px-3 pb-5" id="divActiveExerciseList">
+        <!-- Exercise cards injected by JS -->
+    </div>
+
+    <div class="px-3 pb-4">
+        <button class="btn-card w-100" id="btnAddExerciseDuringWorkout">
+            <i class="bi bi-plus-lg text-accent me-2"></i> Add Exercise
+        </button>
+    </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     PAGE: History
+══════════════════════════════════════════ -->
+<div id="pageHistory" class="page-view d-none">
+    <div class="page-header">
+        <h1 class="page-title">History</h1>
+    </div>
+    <div class="px-3 pb-3">
+        <div id="divHistoryList"></div>
+        <div id="divNoHistory" class="empty-state d-none">
+            <i class="bi bi-clock-history display-5 text-muted"></i>
+            <p class="text-muted mt-2 mb-0">No workouts yet.</p>
+            <p class="text-muted small">Complete a workout to see it here.</p>
+        </div>
+    </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     PAGE: Exercises (Library)
+══════════════════════════════════════════ -->
+<div id="pageExercises" class="page-view d-none">
+    <div class="page-header">
+        <h1 class="page-title">Exercises</h1>
+    </div>
+    <div class="px-3 pb-3">
+        <input class="input-dark mb-3" id="txtExerciseSearch" type="search" placeholder="Search exercises…">
+        <div class="section-label">LOGGED EXERCISES</div>
+        <div id="divExerciseLibrary"></div>
+        <div id="divNoLoggedExercises" class="empty-state d-none">
+            <i class="bi bi-bar-chart display-5 text-muted"></i>
+            <p class="text-muted mt-2 mb-0">No exercises logged yet.</p>
+        </div>
+    </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     PAGE: Exercise Detail
+══════════════════════════════════════════ -->
+<div id="pageExerciseDetail" class="page-view d-none">
+    <div class="page-header">
+        <button class="btn-icon" id="btnBackFromExercise"><i class="bi bi-chevron-left"></i></button>
+        <h1 class="page-title" id="headingExerciseDetail">Exercise</h1>
+    </div>
+    <div class="px-3 pb-3">
+        <!-- Stat pills -->
+        <div class="stat-pills mb-4" id="divExerciseStats"></div>
+
+        <!-- Chart toggle -->
+        <div class="chart-toggle mb-3" id="divChartToggle">
+            <button class="chart-toggle-btn active" data-chart="oneRM">Est. 1RM</button
